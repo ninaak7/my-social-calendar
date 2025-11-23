@@ -23,6 +23,7 @@ class CustomUser(AbstractUser):
         return self.first_name + ' ' + self.last_name
 
     def get_profile_picture(self):
-        if self.profile_picture:
+        if self.profile_picture and hasattr(self.profile_picture, 'url'):
             return self.profile_picture.url
-        return settings.MEDIA_URL + 'profile_pics/default.jpg'
+        # return settings.MEDIA_URL + 'profile_pics/default.jpg'
+        return f"https://res.cloudinary.com/{settings.CLOUDINARY_STORAGE['CLOUD_NAME']}/image/upload/v000000/profile_pics/default.jpg"

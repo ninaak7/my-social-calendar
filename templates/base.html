@@ -194,7 +194,7 @@
         {% if user.is_authenticated %}
             <div class="topbar">
                 <span>{{ user.username }}</span>
-                <img src="{{ user.get_profile_picture }}" alt="Profile Picture">
+                <img src="{{ user.get_profile_picture() }}" alt="Profile Picture">
             </div>
         {% endif %}
 
