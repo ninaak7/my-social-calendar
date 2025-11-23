@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome Page</title>
+</head>
+<body>
+    {% block content %}
+        <div class="welcome-container">
+            <div class="welcome-content">
+                <h1 class="welcome-title">MyCalendar</h1>
+                <p class="welcome-subtitle">Your social calendar — simplified.</p>
+
+                <div class="welcome-buttons">
+                    <span>Already have an account?
+                        <a href="{% url 'login' %}" class="btn btn-light btn-lg">Login</a></span>
+                </div>
+                <div class="welcome-buttons">
+                    <span>Don't have an account?
+                        <a href="{% url 'register' %}" class="btn btn-outline-light btn-lg">Register</a></span>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;800&display=swap');
+
+            body {
+                background: linear-gradient(135deg, #7b5eea, #a991f2, #d6b3ff);
+                font-family: 'Lexend', sans-serif;
+                height: 100vh;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .welcome-container {
+                text-align: center;
+                color: white;
+            }
+
+            .welcome-title {
+                font-size: 80px;
+                font-weight: 800;
+                letter-spacing: 1px;
+                margin-bottom: 10px;
+            }
+
+            .welcome-subtitle {
+                font-size: 26px;
+                font-weight: 400;
+                margin-bottom: 40px;
+            }
+
+            .welcome-buttons {
+                padding-bottom: 5px;
+                font-size: 14px;
+            }
+
+            .welcome-buttons a {
+                margin: -1px;
+                border-radius: 8px;
+                padding: 3px;
+                font-weight: 600;
+                transition: all 0.3s ease;
+            }
+
+            .btn-light:hover {
+                background-color: #f3f3f3;
+                color: #6b4ed8;
+            }
+
+            .btn-outline-light:hover {
+                background-color: white;
+                color: #6b4ed8;
+            }
+        </style>
+    {% endblock %}
+</body>
+</html>

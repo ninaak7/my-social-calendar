@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Event</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+</head>
+<body>
+    {% extends 'base.html' %}
+    {% block content %}
+        <div class="container">
+            <form method="post" id="editEventForm">
+                {% csrf_token %}
+                <div class="mb-2">
+                    <label class="p-label">Title</label><br>
+                    <input type="text" name="title" value="{{ event.title }}" required>
+                </div>
+
+                <div class="mb-2">
+                    <label class="p-label">Description</label><br>
+                    <textarea name="description">{{ event.description }}</textarea>
+                </div>
+
+                <div class="mb-2">
+                    <label class="p-label">Tag</label>
+                    <select name="tag">
+                        <option value=""></option>
+                        <option value="personal" {% if event.tag == "personal" %}selected{% endif %}>Personal</option>
+                        <option value="family" {% if event.tag == "family" %}selected{% endif %}>Family</option>
+                        <option value="social" {% if event.tag == "social" %}selected{% endif %}>Social</option>
+                        <option value="entertainment" {% if event.tag == "entertainment" %}selected{% endif %}>Entertainment</option>
+                        <option value="education" {% if event.tag == "education" %}selected{% endif %}>Education</option>
+                        <option value="holiday" {% if event.tag == "holiday" %}selected{% endif %}>Holiday</option>
+                    </select>
+                </div>
+
+                <div class="mb-2">
+                    <label class="p-label">Visibility</label>
+                    <select name="visibility" id="visibility">
+                        <option value="private" {% if event.visibility == "private" %}selected{% endif %}>Only me</option>
+                        <option value="public" {% if event.visibility == "public" %}selected{% endif %}>Everyone</option>
+                        <option value="invited" {% if event.visibility == "invited" %}selected{% endif %}>Only invited users</option>
+                        <option value="custom" {% if event.visibility == "custom" %}selected{% endif %}>Custom selection</option>
+                    </select>
+                </div>
+
+                <div id="customVisibilityOptions" class="custom-visibility mb-2" style="display:none;">
+                    <div class="visibility-lists">
+                        <div class="visibility-list">
+                            <p class="p-label-small">Friends</p>
+                            <ul class="list-group scrollable-list small-list">
+                                {% for f in friends %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>{{ f.username }}</span>
+                                        <input type="checkbox" name="visible_to_friends" value="{{ f.id }}"
+                                            {% if f in event.visible_to_friends.all %}checked{% endif %}>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                        <div class="visibility-list">
+                            <p class="p-label-small">Groups</p>
+                            <ul class="list-group scrollable-list small-list">
+                                {% for g in groups %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>{{ g.name }}</span>
+                                        <input type="checkbox" name="visible_to_groups" value="{{ g.id }}"
+                                            {% if g in event.visible_to_groups.all %}checked{% endif %}>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col mb-2 d">
+                        <label class="p-label">Start time</label><br>
+                        <input type="datetime-local" name="start_time" value="{{ event.start_time|date:'Y-m-d\\TH:i' }}" required step="900">
+                    </div>
+                    <div class="col mb-2 d">
+                        <label class="p-label">End time</label><br>
+                        <input type="datetime-local" name="end_time" value="{{ event.end_time|date:'Y-m-d\\TH:i' }}" required step="900">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn custom-btn">Save</button>
+                <a href="{% url 'event_details' event.id %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+
+        <style>
+            .p-label {
+                font-size: 17px;
+            }
+
+            input, textarea, option {
+                width: 50%;
+                padding-left: 7px;
+            }
+
+            .row.mb-2 .col.d {
+                flex: 0 0 auto;
+                width: 390px;
+                margin-right: -145px;
+            }
+
+            #visibility {
+                width: 150px;
+                padding-left: 1px;
+            }
+
+            .custom-visibility {
+                margin-top: 8px;
+            }
+
+            .visibility-lists {
+                display: flex;
+                align-items: flex-start;
+                gap: 50px;
+            }
+
+            .visibility-list {
+                width: 250px;
+            }
+
+            .p-label-small {
+                font-size: 14px;
+                margin-bottom: 1px;
+                text-align: center;
+                color: #0c0000;
+            }
+
+            .scrollable-list.small-list {
+                max-height: 138px;
+                overflow-y: auto;
+                border: 0.5px solid #4b3e72;
+                border-radius: 8px;
+                background-color: #fff;
+            }
+
+            .scrollable-list.small-list::-webkit-scrollbar {
+                width: 6px;
+            }
+            .scrollable-list.small-list::-webkit-scrollbar-thumb {
+                background-color: #a599c9;
+                border-radius: 4px;
+            }
+
+            .list-group-item {
+                font-size: 14px;
+                padding: 6px 10px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .list-group-item input[type="checkbox"] {
+                width: 20px;
+                accent-color: #4b3e72;
+                transform: scale(1.1);
+            }
+        </style>
+
+        <script>
+            document.getElementById('visibility').addEventListener('change', function() {
+                document.getElementById('customVisibilityOptions').style.display =
+                    this.value === 'custom' ? 'block' : 'none';
+            });
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const select = document.getElementById('visibility');
+                const customSection = document.getElementById('customVisibilityOptions');
+                customSection.style.display = select.value === 'custom' ? 'block' : 'none';
+            });
+        </script>
+    {% endblock %}
+</body>
+</html>

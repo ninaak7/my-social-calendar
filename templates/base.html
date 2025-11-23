@@ -1,0 +1,225 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}MyCalendar{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600&family=Zilla+Slab:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --wisteria: #A599C9;
+            --magnolia: #F8F4FF;
+        }
+
+        body {
+            background-color: var(--magnolia);
+            font-family: 'Zilla Slab', serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            font-family: 'Lexend', sans-serif;
+            background: linear-gradient(180deg, var(--wisteria) 0%, #8e82c0 100%);
+            width: 230px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 25px 20px;
+            color: white;
+            border-radius: 0px 20px 20px 0px;
+        }
+
+        .sidebar h2 {
+            font-family: 'Lexend', sans-serif;
+            font-size: 26px;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar ul li a:hover,
+        .sidebar ul li a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar .logout {
+            text-align: center;
+            padding-top: 20px;
+        }
+
+        .sidebar .logout a {
+            color: white;
+            text-decoration: none;
+            font-weight: normal;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar .logout a:hover {
+            opacity: 0.8;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .topbar {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .topbar img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .topbar span {
+            font-family: 'Lexend', sans-serif;
+            font-weight: 600;
+            color: #4b3e72;
+        }
+
+        .custom-btn {
+            background-color: #4b3e72;
+            color: #fff;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--wisteria);
+            border-radius: 4px;
+        }
+
+        .messages-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            width: auto;
+            font-size: 14px;
+        }
+
+        .alert {
+            border-radius: 7px;
+            padding: 5px 5px;
+            margin-bottom: 10px;
+            font-family: "Zilla Slab", serif;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            background-color: #ffffff;
+            color: white;
+            animation: fadein 0.5s;
+            border-left: 4px solid #4b3e72;
+        }
+
+        .alert.success {
+            background-color: #40c463;
+        }
+
+        .alert.info {
+            background-color: #4da6ff;
+        }
+
+        .alert.warning {
+            background-color: #ffb84d;
+        }
+
+        .alert.error {
+            background-color: #ff4d4d;
+        }
+
+        @keyframes fadein {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div>
+            <h2>MyCalendar</h2>
+            {% if user.is_authenticated %}
+                <ul>
+                    <li><a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}">🏠 Home</a></li>
+                    <li><a href="{% url 'friend_list' %}" class="{% if request.path == '/friends/' %}active{% endif %}">👥 Friends</a></li>
+                    <li><a href="{% url 'group_list' %}" class="{% if request.path == '/groups/' %}active{% endif %}">👪 Groups</a></li>
+                    <li><a href="{% url 'event_list' %}" class="{% if request.path == '/events/' %}active{% endif %}">📅 Events</a></li>
+                </ul>
+                <div class="logout">
+                    <a href="{% url 'logout' %}">LOGOUT</a>
+                </div>
+            {% else %}
+                <ul>
+                    <li><a href="{% url 'register' %}" class="{% if request.path == '/register/' %}active{% endif %}">Register</a></li>
+                    <li><a href="{% url 'login' %}" class="{% if request.path == '/login/' %}active{% endif %}">Login</a></li>
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="main-content">
+        {% if user.is_authenticated %}
+            <div class="topbar">
+                <span>{{ user.username }}</span>
+                <img src="{{ user.get_profile_picture }}" alt="Profile Picture">
+            </div>
+        {% endif %}
+
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                <div class="{{ message.tags }} alert fade show" role="alert">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script>
+        setTimeout(() => {
+            document.querySelectorAll('.alert').forEach(el => {
+                el.style.transition = "opacity 0.5s";
+                el.style.opacity = "0";
+                setTimeout(() => el.remove(), 500);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

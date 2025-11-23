@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+    {% extends 'base.html' %}
+    {% block content %}
+        <div class="container mt-2">
+            <div class="text-start mb-3">
+                <a href="{% url 'add_event' %}" class="btn custom-btn">+ Add New Event</a>
+                <a href="?week=0" class="btn btn-outline-secondary">Current Week</a>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <a href="?week={{ prev_week }}" class="btn custom-btn">&#8592;</a>
+                <h3 class="text-center m-0 weeks">{{ week_start }} - {{ week_end }}</h3>
+                <a href="?week={{ next_week }}" class="btn custom-btn">&#8594;</a>
+            </div>
+
+            <div class="calendar-wrapper">
+                <div class="calendar-hours">
+                    <br>
+                    <br>
+                    {% for hour in hours %}
+                        <div class="calendar-hour-label">{{ hour }}:00</div>
+                    {% endfor %}
+                </div>
+
+                <div class="calendar-grid">
+                    {% for day in days %}
+                        <div class="calendar-day-header">
+                            <div>{{ day.weekday }}</div>
+                            <div class="small">{{ day.date }}</div>
+                        </div>
+                    {% endfor %}
+
+                    {% for day in days %}
+                        <div class="calendar-day-column" data-date="{{ day.date|date:'Y-m-d' }}">
+                            {% for hour in hours %}
+                                <div class="calendar-hour-cell"></div>
+                            {% endfor %}
+
+                            {% for event in day.events %}
+                                <div class="calendar-event tag-{{ event.tag }}"
+                                     style="top:{{ event.start_offset }}px; height:{{ event.duration_height }}px;"
+                                     onclick="window.location.href='{% url 'event_details' event.id %}'">
+                                    {{ event.title }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .weeks {
+                font-family: 'Lexend', sans-serif;
+            }
+
+            .calendar-wrapper {
+                display: flex;
+                gap: 5px;
+                background: white;
+                padding-top: 5px;
+                padding-right: 25px;
+                padding-bottom: 25px;
+                border-radius: 6px;
+            }
+
+            .calendar-hours {
+                width: 60px;
+                text-align: right;
+                padding-right: 5px;
+            }
+
+            .calendar-grid {
+                flex: 1;
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                position: relative;
+            }
+
+            .calendar-day-header {
+                text-align: center;
+                font-weight: bold;
+                padding: 5px 0;
+                border-bottom: 2px solid #ddd;
+            }
+
+            .calendar-hour-label {
+                height: 60px;
+                font-size: 14px;
+            }
+
+            .calendar-hour-cell {
+                height: 60px;
+                border-top: 1px solid #eee;
+            }
+
+            .calendar-day-column {
+                position: relative;
+                border-left: 1px solid #ddd;
+            }
+
+            .calendar-event {
+                position: absolute;
+                width: 95%;
+                border-radius: 6px;
+                padding: 3px 6px;
+                font-size: 12px;
+                color: white;
+                overflow: hidden;
+                cursor: pointer;
+                background: #A599C9FF;
+            }
+
+            .tag-personal { background: #4b3e72; }
+            .tag-family { background: #e8a86f; }
+            .tag-social { background: #7cb2f3; }
+            .tag-entertainment { background: #6bdd85; }
+            .tag-education {background: #ed6565; }
+            .tag-holiday { background: #f1e890; }
+
+             .current-time-line {
+                    position: absolute;
+                    left: 0px;
+                    right: 0px;
+                    height: 1.5px;
+                    background-color: #60528c;
+                    box-shadow: 0 0 8px rgb(75, 62, 114);
+                    z-index: 10;
+                    border-radius: 2px;
+                    transition: top 0.5s ease-out;
+                    animation: pulse-glow 2s infinite ease-in-out;
+                }
+
+            .current-time-dot {
+                position: absolute;
+                left: -6px;
+                width: 10px;
+                height: 10px;
+                background-color: #60528c;
+                border-radius: 50%;
+                box-shadow: 0 0 10px rgb(75, 62, 114);
+                z-index: 11;
+                transform: translateY(-50%);
+                animation: dot-pulse 2s infinite ease-in-out;
+            }
+        </style>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const today = new Date();
+                const todayStr = today.toISOString().split('T')[0];
+                const todayCol = document.querySelector(`.calendar-day-column[data-date="${todayStr}"]`);
+
+                if (todayCol) {
+                    const line = document.createElement('div');
+                    const dot = document.createElement('div');
+                    line.classList.add('current-time-line');
+                    dot.classList.add('current-time-dot');
+                    todayCol.appendChild(line);
+                    todayCol.appendChild(dot);
+
+                    function updateLinePosition() {
+                        const now = new Date();
+                        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+                        line.style.top = `${currentMinutes}px`;
+                        dot.style.top = `${currentMinutes}px`;
+                    }
+
+                    updateLinePosition();
+                    setInterval(updateLinePosition, 30000);
+                }
+            });
+        </script>
+    {% endblock %}
+</body>
+</html>

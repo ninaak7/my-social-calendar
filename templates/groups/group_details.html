@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Group Details</title>
+</head>
+<body>
+    {% extends 'base.html' %}
+    {% block content %}
+        <div class="container mt-3">
+            <p class="group-title">{{ group.name }}</p>
+            <p class="created-by">Created by: <strong>{{ group.created_by.username }}</strong></p>
+
+            <p class="members-title">Members</p>
+            {% if members %}
+                <ul class="list-group mb-3">
+                    {% for m in members %}
+                        <li class="list-group-item">{{ m.first_name }} {{  m.last_name }} ({{ m.username }})</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No members yet.</p>
+            {% endif %}
+
+            {% if request.user == group.created_by %}
+                <a href="{% url 'edit_group' group.id %}" class="btn custom-btn">Edit</a>
+                <a href="{% url 'delete_group' group.id %}" class="btn custom-btn">Delete</a>
+            {% endif %}
+            <a href="{% url 'group_list' %}" class="btn btn-secondary">Back</a>
+        </div>
+
+        <style>
+            .group-title {
+                display: inline-block;
+                font-size: 40px;
+                font-weight: bolder;
+            }
+
+            .created-by {
+                display: inline-block;
+                padding-left: 10px;
+            }
+
+            .members-title {
+                padding-left: 350px;
+                font-weight: bolder;
+                margin-bottom: -1px;
+            }
+
+            .list-group {
+                border: 0.5px solid #4b3e72;
+                border-radius: 8px;
+            }
+        </style>
+    {% endblock %}
+</body>
+</html>

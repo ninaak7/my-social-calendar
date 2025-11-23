@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+</head>
+<body>
+    {% extends 'base.html' %}
+    {% block title %}Register{% endblock %}
+
+    {% block content %}
+        <div class="container">
+            <form method="POST" enctype="multipart/form-data" class="p-4 rounded shadow-sm bg-white">
+                {% csrf_token %}
+
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                       <label for="{{ form.first_name.id_for_label }}" class="form-label">First name:</label>
+                       {{ form.first_name }}
+                    </div>
+                    <div class="col-md-6">
+                       <label for="{{ form.last_name.id_for_label }}" class="form-label">Last name:</label>
+                       {{ form.last_name }}
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <label for="{{ form.username.id_for_label }}" class="form-label">Username:</label>
+                        {{ form.username }}
+                        {% for error in form.username.errors %}
+                            <div class="error-msg">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">Email:</label>
+                        {{ form.email }}
+                        {% for error in form.email.errors %}
+                            <div class="error-msg">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <label for="{{ form.birthday.id_for_label }}" class="form-label">Birthday:</label>
+                        {{ form.birthday }}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.gender.id_for_label }}" class="form-label">Gender:</label>
+                        {{ form.gender }}
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <label for="{{ form.profile_picture.id_for_label }}" class="form-label">Profile Picture:</label>
+                        {{ form.profile_picture }}
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                        <label for="{{ form.password1.id_for_label }}" class="form-label">Password:</label>
+                        {{ form.password1 }}
+                        {% for error in form.password1.errors %}
+                            <div class="error-msg">{{ error }}</div>
+                        {% endfor %}
+
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.password2.id_for_label }}" class="form-label">Confirm Password:</label>
+                        {{ form.password2 }}
+                        {% for error in form.password2.errors %}
+                            <div class="error-msg">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="empty"></div>
+                <button type="submit" class="btn custom-btn">Register</button>
+            </form>
+
+            {% if form.errors %}
+                <div class="error">Please correct the errors.</div>
+            {% endif %}
+        </div>
+
+        <style>
+            .form-label {
+                font-weight: normal;
+                margin-bottom: -2px;
+            }
+
+            input, select {
+                width: 100%;
+                font-size: 16px;
+                padding: 3px;
+                padding-left: 6px;
+                border: 0.5px solid #4b3e72;
+                border-radius: 8px;
+            }
+
+            .error-msg {
+                font-size: 12px;
+                color: #4b3e72;
+                margin-bottom: -5px;
+            }
+
+            .error {
+                color: #4B3E72FF;
+                list-style-type: none;
+                padding-left: 10px;
+                font-weight: bold;
+            }
+
+            .empty {
+                width: 8px;
+                height: 8px;
+            }
+        </style>
+    {% endblock %}
+</body>
+</html>

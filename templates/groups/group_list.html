@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Groups</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    {% extends 'base.html' %}
+    {% block content %}
+        <div class="container">
+            <ul class="nav nav-tabs" id="groupsTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="mygroups-tab" data-bs-toggle="tab" data-bs-target="#mygroups" type="button" role="tab">My Groups</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="othergroups-tab" data-bs-toggle="tab" data-bs-target="#othergroups" type="button" role="tab">Other Groups</button>
+                </li>
+            </ul>
+
+            <div class="tab-content p-4 custom-tab-content" id="groupsTabContent">
+                <div class="tab-pane fade show active" id="mygroups" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'add_group' %}" class="btn add-friend-btn">➕ Create New Group</a>
+                    </div>
+
+                    {% if user_groups %}
+                        <ul class="list-group">
+                            {% for group in user_groups %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center friend-item">
+                                    <a href="{% url 'group_details' group.id %}" class="group-name">{{ group.name }}</a>
+                                    <small class="text-muted">{{ group.members.count }} members</small>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted mt-3">You haven’t created any groups yet.</p>
+                    {% endif %}
+                </div>
+
+                <div class="tab-pane fade" id="othergroups" role="tabpanel">
+                    {% if member_groups %}
+                        <ul class="list-group">
+                            {% for group in member_groups %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center friend-item">
+                                    <a href="{% url 'group_details' group.id %}" class="group-name">{{ group.name }}</a>
+                                    <small class="text-muted">Created by: {{ group.created_by.username }}</small>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted mt-3">You’re not a member of any groups.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .group-name {
+                text-decoration: none;
+                color: black;
+            }
+
+            .custom-tab-content {
+                background-color: #F8F4FF;
+                border: 0.5px solid #A599C9;
+                border-radius: 0 16px 16px 16px;
+                box-shadow: 0 6px 16px rgba(165, 153, 201, 0.15);
+                animation: fadeIn 0.4s ease;
+            }
+
+            .nav-tabs {
+                background-color: #F8F4FF;
+                border-radius: 12px 12px 0 0;
+                border: none;
+                overflow: hidden;
+            }
+
+            .nav-tabs .nav-link {
+                border: none;
+                color: #4A3F75;
+                font-weight: 500;
+                padding: 10px 18px;
+                transition: 0.3s ease;
+                border-radius: 12px 12px 0 0;
+                background-color: #FFFFFF;
+            }
+
+            .nav-tabs .nav-link.active {
+                background-color: #F8F4FF;
+                border: 0.5px solid #A599C9;
+                color: #4A3F75;
+                border-bottom: none;
+                position: relative;
+                z-index: 2;
+            }
+
+            .nav-tabs .nav-link:hover:not(.active) {
+                background-color: #EDE7FF;
+                color: #4A3F75;
+            }
+
+            .add-friend-btn {
+                background-color: #A599C9;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 5px 10px;
+                font-size: 14px;
+                transition: 0.3s ease;
+            }
+
+            .add-friend-btn:hover {
+                background-color: #F8F4FF;
+            }
+
+            .friend-item {
+                background-color: #FFFFFF;
+                border: 1px solid #E0DAF5;
+                border-radius: 10px;
+                margin-bottom: 8px;
+                padding: 10px 14px;
+                font-family: "Zilla Slab", serif;
+            }
+
+            .friend-item:hover {
+                background-color: #EDE7FF;
+                transition: 0.3s ease;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(6px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        </style>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const tabButtons = document.querySelectorAll('#groupsTab button[data-bs-toggle="tab"]');
+                const lastActiveTab = localStorage.getItem('activeTab');
+                if (lastActiveTab) {
+                    const tab = document.querySelector(lastActiveTab);
+                    if (tab) {
+                        const bsTab = new bootstrap.Tab(tab);
+                        bsTab.show();
+                    }
+                }
+
+                tabButtons.forEach(btn => {
+                    btn.addEventListener('shown.bs.tab', e => {
+                        localStorage.setItem('activeTab', `#${e.target.id}`);
+                    });
+                });
+            });
+        </script>
+    {% endblock %}
+</body>
+</html>

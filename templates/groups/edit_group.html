@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Group</title>
+</head>
+<body>
+    {% extends 'base.html' %}
+    {% block content %}
+        <div class="container">
+            <form method="post" id="editGroupForm">
+                {% csrf_token %}
+                <div class="mb-3 mt-3">
+                    <label for="group_name" class="form-label">Group Name</label>
+                    {{ form.name }}
+                </div>
+
+                <div class="member-sections">
+                    <div class="member-list">
+                        <p class="p-label">Selected Members</p>
+                        <ul id="selected-friends" class="list-group scrollable-list mb-3">
+                        {% for member in selected_members %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center" data-id="{{ member.id }}">
+                            {% if member == request.user %}
+                                <span>You</span>
+                            {% else %}
+                                <span>{{ member.first_name }} {{ member.last_name }} ({{ member.username }})</span>
+                                {% if group.created_by != request.user or member != group.created_by %}
+                                    <button type="button" class="btn btn-sm custom-btn remove-friend">Remove</button>
+                                {% endif %}
+                            {% endif %}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="member-list">
+                        <p class="p-label">Available Friends</p>
+                        <ul id="friends-list" class="list-group scrollable-list">
+                        {% for friend in available_friends %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center" data-id="{{ friend.id }}">
+                                <span>{{ friend.first_name }} {{ friend.last_name }} ({{ friend.username }})</span>
+                                <button type="button" class="btn btn-sm custom-btn add-friend">Add</button>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <select name="members" id="id_members" multiple hidden>
+                    {% for member in selected_members %}
+                        <option value="{{ member.id }}" selected></option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit" class="btn custom-btn">Save</button>
+                <a href="{% url 'group_details' group.id %}" class="btn btn-secondary">Back</a>
+            </form>
+        </div>
+
+        <style>
+            .member-sections {
+                display: flex;
+                gap: 20px;
+                margin-top: 10px;
+            }
+
+            .member-list {
+                flex: 1;
+            }
+
+            .p-label {
+                font-size: 17px;
+                padding-left: 120px;
+                margin-bottom: -0.1px;
+            }
+
+            .list-group {
+                margin-top: 5px;
+            }
+
+            .list-group-item span {
+                height: 30px;
+                padding-top: 3px;
+            }
+
+            .scrollable-list {
+                max-height: 300px;
+                overflow-y: auto;
+                border: 0.5px solid #4b3e72;
+                border-radius: 8px;
+                background-color: white;
+            }
+
+            .scrollable-list::-webkit-scrollbar {
+                width: 8px;
+            }
+            .scrollable-list::-webkit-scrollbar-thumb {
+                background-color: #a599c9;
+                border-radius: 4px;
+            }
+        </style>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const friendsList = document.getElementById('friends-list');
+                const selectedFriendsList = document.getElementById('selected-friends');
+                const hiddenSelect = document.getElementById('id_members');
+
+                friendsList.addEventListener('click', function (e) {
+                    if (e.target.classList.contains('add-friend')) {
+                        const li = e.target.closest('li');
+                        const userId = li.dataset.id;
+                        const username = li.querySelector('span').textContent;
+
+                        const selectedItem = document.createElement('li');
+                        selectedItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+                        selectedItem.dataset.id = userId;
+                        selectedItem.innerHTML = `
+                            <span>${username}</span>
+                            <button type="button" class="btn btn-sm custom-btn remove-friend">Remove</button>
+                        `;
+                        selectedFriendsList.appendChild(selectedItem);
+
+                        const option = document.createElement('option');
+                        option.value = userId;
+                        option.selected = true;
+                        hiddenSelect.appendChild(option);
+
+                        li.remove();
+                    }
+                });
+
+                selectedFriendsList.addEventListener('click', function (e) {
+                    if (e.target.classList.contains('remove-friend')) {
+                        const li = e.target.closest('li');
+                        const userId = li.dataset.id;
+                        const username = li.querySelector('span').textContent;
+
+                        li.remove();
+
+                        const option = hiddenSelect.querySelector(`option[value="${userId}"]`);
+                        if (option) option.remove();
+
+                        const newLi = document.createElement('li');
+                        newLi.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+                        newLi.dataset.id = userId;
+                        newLi.innerHTML = `
+                            <span>${username}</span>
+                            <button type="button" class="btn btn-sm custom-btn add-friend">Add</button>
+                        `;
+                        friendsList.appendChild(newLi);
+                    }
+                });
+            });
+        </script>
+    {% endblock %}
+</body>
+</html>

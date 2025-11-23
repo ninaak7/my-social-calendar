@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Details</title>
+</head>
+<body>
+    {% extends 'base.html' %}
+    {% block content %}
+        <div class="container mt-3">
+            <p class="group-title">{{ event.title }}</p>
+            <p>Description: <strong>{{ event.description }}</strong></p>
+            {% if event.tag %}
+                <p>Tag: <strong>{{ event.tag }}</strong></p>
+            {% endif %}
+            <p>Start: <strong>{{ event.start_time|date:"M d, Y H:i" }}</strong></p>
+            <p>End: <strong>{{ event.end_time|date:"M d, Y H:i" }}</strong></p>
+            <p>Created by: <strong>{{ event.created_by.username }}</strong></p>
+
+            {% if invitations.count > 0 %}
+                {% if accepted_invitations.count > 0 %}
+                    <p class="accepted-by">Accepted by:</p>
+                    <ul>
+                        {% for inv in accepted_invitations %}
+                        <li><strong>{{ inv.user.username }}</strong></li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No one has accepted yet.</p>
+                {% endif %}
+            {% endif %}
+
+            {% if event.created_by == request.user %}
+                <a href="{% url 'edit_event' event.id %}" class="btn custom-btn">Edit</a>
+                <a href="{% url 'delete_event' event.id %}" class="btn custom-btn">Delete</a>
+            {% endif %}
+            <a href="{% url 'event_list' %}" class="btn btn-secondary">Back</a>
+        </div>
+
+        <style>
+            .group-title {
+                font-size: 40px;
+                font-weight: bolder;
+            }
+
+            .accepted-by {
+                margin-bottom: 2px;
+            }
+
+            li {
+                margin-bottom: 2px;
+            }
+
+            ul {
+                margin-bottom: 15px;
+            }
+        </style>
+    {% endblock %}
+</body>
+</html>

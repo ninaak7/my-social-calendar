@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+    {% extends 'base.html' %}
+    {% block title %}Login{% endblock %}
+
+    {% block content %}
+        <div class="container">
+            <form method="POST" class="p-4 rounded shadow-sm bg-white">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="{{ form.username.id_for_label }}" class="form-label">Username:</label>
+                    <br>
+                    {{ form.username }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.password.id_for_label }}" class="form-label">Password:</label>
+                    <br>
+                    {{ form.password }}
+                </div>
+
+                <button type="submit" class="btn custom-btn">Login</button>
+            </form>
+
+            {% if form.errors %}
+                <div class="error">Invalid username or password.</div>
+            {% endif %}
+        </div>
+
+        <style>
+            .form-label {
+                font-weight: normal;
+                margin-bottom: -2px;
+            }
+
+            input, select {
+                width: 40%;
+                font-size: 16px;
+                padding: 3px;
+                padding-left: 6px;
+                border: 0.5px solid #4b3e72;
+                border-radius: 8px;
+            }
+
+            .error {
+                color: #4B3E72FF;
+                list-style-type: none;
+                padding-left: 10px;
+                font-weight: bold;
+            }
+        </style>
+    {% endblock %}
+</body>
+</html>
